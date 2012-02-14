@@ -14,11 +14,11 @@ Ember.Handlebars.registerHelper('lorem', function(options) {
 
 
 // define some data to play around with for the route parameters section
-App.posts = [];
+App.items = [];
 for(var i = 1; i <= 10; i++) {
-  App.posts.pushObject(Em.Object.create({
+  App.items.pushObject(Em.Object.create({
     id: i,
-    title: 'Post ' + i,
+    title: 'Item ' + i,
     url: "#route-parameters/" + i
   }));
 }
@@ -50,40 +50,40 @@ App.routeManager = Em.RouteManager.create({
   rootLayout: App.main,
   home: App.NavState.create({
     selector: '.home',
-    view: Em.View.create({
+    viewClass: Em.View.extend({
       templateName: 'home'
     })
   }),
   layoutNesting: App.NavState.create({
     selector: '.layout-nesting',
     path: 'layout-nesting',
-    view: Em.LayoutView.create({
+    viewClass: Em.LayoutView.extend({
       templateName: 'layout-nesting',
     }),
     section1: App.SubNavState.create({
       path: 'section1',
-      view: Em.View.create({
+      viewClass: Em.View.extend({
         title: 'Section 1',
         templateName: 'section'
       })
     }),
     section2: App.SubNavState.create({
       path: 'section2',
-      view: Em.View.create({
+      viewClass: Em.View.extend({
         title: 'Section 2',
         templateName: 'section'
       })
     }),
     section3: App.SubNavState.create({
       path: 'section3',
-      view: Em.View.create({
+      viewClass: Em.View.extend({
         title: 'Section 3',
         templateName: 'section'
       })
     }),
     section4: App.SubNavState.create({
       path: 'section4',
-      view: Em.View.create({
+      viewClass: Em.View.extend({
         title: 'Section 4',
         templateName: 'section'
       })
@@ -92,26 +92,26 @@ App.routeManager = Em.RouteManager.create({
   routeParameters: App.NavState.create({
     selector: '.route-parameters',
     path: 'route-parameters',
-    view: Em.LayoutView.create({
+    viewClass: Em.LayoutView.extend({
       templateName: 'route-parameters',
     }),
-    posts: Em.LayoutState.create({
-      view: Em.View.create({
-        templateName: 'posts',
-        contentBinding: 'App.posts'
+    items: Em.LayoutState.create({
+      viewClass: Em.View.extend({
+        templateName: 'items',
+        contentBinding: 'App.items'
       })
     }),
-    post: Em.LayoutState.create({
-      path: ':postId', // specify the path to take a parameter
-      view: Em.View.create({
-        templateName: 'post'
+    item: Em.LayoutState.create({
+      path: ':itemId', // specify the path to take a parameter
+      viewClass: Em.View.extend({
+        templateName: 'item'
       }),
       // consume the path parameter when the state is entered
       enter: function(stateManager, transition) {
         this._super(stateManager, transition);
-        var postId = stateManager.getPath('params.postId');
-        var post = App.posts[postId - 1];
-        this.get('view').set('content', post);
+        var itemId = stateManager.getPath('params.itemId');
+        var item = App.items[itemId - 1];
+        this.get('view').set('content', item);
       }
     })
   })

@@ -98,8 +98,8 @@
       </section>
     </script>
     
-    <script type="text/x-handlebars" data-template-name="posts">
-      <h1>Posts</h1>
+    <script type="text/x-handlebars" data-template-name="items">
+      <h1>Items</h1>
       <ul class="nav nav-tabs nav-stacked">
       {{#each content}}
         <li><a {{bindAttr href="url"}}>{{title}}</a></li>
@@ -107,7 +107,7 @@
       </ul>
     </script>
     
-    <script type="text/x-handlebars" data-template-name="post">
+    <script type="text/x-handlebars" data-template-name="item">
       <h1>{{content.title}}</h3>
       {{lorem type=paragraph amount=3}}
     </script>
