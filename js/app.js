@@ -1,8 +1,8 @@
-App = Em.Namespace.create();
+window.App = Ember.Application.create();
 
 // Handlebars helper to generate text
 Ember.Handlebars.registerHelper('lorem', function(options) {
-  opts = {ptags:true}
+  var opts = {ptags:true}
   if(options.hash.type) {
     opts.type = options.hash.type;
   }
@@ -40,14 +40,14 @@ App.SubNavState = App.NavState.extend({
 })
 
 // The top level layout
-App.main = Em.LayoutView.create({
+App.main = Em.View.create({
   templateName: 'main'
 });
 
 // Here we define the top level routes and
 // their corresponding views (inline)
 App.routeManager = Em.RouteManager.create({
-  rootLayout: App.main,
+  rootView: App.main,
   home: App.NavState.create({
     selector: '.home',
     viewClass: Em.View.extend({
@@ -56,33 +56,33 @@ App.routeManager = Em.RouteManager.create({
   }),
   layoutNesting: App.NavState.create({
     selector: '.layout-nesting',
-    path: 'layout-nesting',
-    viewClass: Em.LayoutView.extend({
+    route: 'layout-nesting',
+    viewClass: Em.View.extend({
       templateName: 'layout-nesting',
     }),
     section1: App.SubNavState.create({
-      path: 'section1',
+      route: 'section1',
       viewClass: Em.View.extend({
         title: 'Section 1',
         templateName: 'section'
       })
     }),
     section2: App.SubNavState.create({
-      path: 'section2',
+      route: 'section2',
       viewClass: Em.View.extend({
         title: 'Section 2',
         templateName: 'section'
       })
     }),
     section3: App.SubNavState.create({
-      path: 'section3',
+      route: 'section3',
       viewClass: Em.View.extend({
         title: 'Section 3',
         templateName: 'section'
       })
     }),
     section4: App.SubNavState.create({
-      path: 'section4',
+      route: 'section4',
       viewClass: Em.View.extend({
         title: 'Section 4',
         templateName: 'section'
@@ -91,8 +91,8 @@ App.routeManager = Em.RouteManager.create({
   }),
   routeParameters: App.NavState.create({
     selector: '.route-parameters',
-    path: 'route-parameters',
-    viewClass: Em.LayoutView.extend({
+    route: 'route-parameters',
+    viewClass: Em.View.extend({
       templateName: 'route-parameters',
     }),
     items: Em.LayoutState.create({
@@ -102,7 +102,7 @@ App.routeManager = Em.RouteManager.create({
       })
     }),
     item: Em.LayoutState.create({
-      path: ':itemId', // specify the path to take a parameter
+      route: ':itemId', // specify the path to take a parameter
       viewClass: Em.View.extend({
         templateName: 'item'
       }),
