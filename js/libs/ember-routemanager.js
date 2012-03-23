@@ -42,7 +42,7 @@ Ember.RouteManager = Ember.StateManager.extend({
 
    You will also need to make sure that baseURI is properly configured, as
    well as your server so that your routes are properly pointing to your
-   SproutCore application.
+   Ember application.
 
    @see http://dev.w3.org/html5/spec/history.html#the-history-interface
    @property
@@ -193,13 +193,12 @@ Ember.RouteManager = Ember.StateManager.extend({
   },
 
   /**
-   You usually don't need to call this method. It is done automatically after
-   the application has been initialized.
-
-   It registers for the hashchange event if available. If not, it creates a
+   Start this routemanager.
+   
+   Registers for the hashchange event if available. If not, it creates a
    timer that looks for location changes every 150ms.
    */
-  ping: function() {
+  start: function() {
     if(!this._didSetup) {
       this._didSetup = true;
       var state;
@@ -240,9 +239,9 @@ Ember.RouteManager = Ember.StateManager.extend({
         } else {
           // we don't use a Ember.Timer because we don't want
           // a run loop to be triggered at each ping
-          var invokeHashChange = function() {
-            this.hashChange();
-            this._timerId = setTimeout(invokeHashChange, 100);
+          var _this = this, invokeHashChange = function() {
+            _this.hashChange();
+            _this._timerId = setTimeout(invokeHashChange, 100);
           };
 
           invokeHashChange();
@@ -250,8 +249,11 @@ Ember.RouteManager = Ember.StateManager.extend({
       }
     }
   },
-
-  destroy: function() {
+  
+  /**
+   Stop this routemanager
+   */
+  stop: function() {
     if(this._didSetup) {
       if(get(this, 'wantsHistory') && supportsHistory) {
         jQuery(window).unbind('popstate', this.popState);
@@ -262,19 +264,13 @@ Ember.RouteManager = Ember.StateManager.extend({
           clearTimeout(this._timerId);
         }
       }
+      this._didSetup = false;
     }
-    this._super();
   },
 
-  /**
-   Ember.RouteManager currently automatically starts listening
-   for browser location changes when created.
-   */
-  init: function() {
+  destroy: function() {
+    this.stop();
     this._super();
-    if(!this._didSetup) {
-      this.ping();
-    }
   },
 
   /**
@@ -316,10 +312,15 @@ Ember.RouteManager = Ember.StateManager.extend({
         var cleanState = result.cleanStates.join('.');
         this.goToState(cleanState);
       }
+      
       // 2. We transition to the dirty state. This forces dirty
       // states to be transitioned.
       if(result.dirtyStates.length > 0) {
         var dirtyState = result.cleanStates.concat(result.dirtyStates).join('.');
+        // Special case for re-entering the root state on a parameter change
+        if(this.currentState && dirtyState === this.currentState.get('path')) {
+          this.goToState('__nullState');
+        }
         this.goToState(dirtyState);
       }
     } else {
@@ -437,7 +438,7 @@ Ember.RouteManager = Ember.StateManager.extend({
         }
         var part = parts.shift();
         var partDefinition = partDefinitions[i];
-        var partParams = this._matchPart(partDefinition, part);
+        var partParams = this._matchPart(partDefinition, part, state);
         if(!partParams) {
           return false;
         }
@@ -451,10 +452,9 @@ Ember.RouteManager = Ember.StateManager.extend({
       }
     }
 
-    if(Ember.typeOf(state.willAccept) == 'function') {
-      if(!state.willAccept(params)) {
-        return false;
-      }
+    var enabled = get(state, 'enabled');
+    if(enabled !== undefined && !enabled) {
+      return false;
     }
 
     return {
@@ -467,7 +467,9 @@ Ember.RouteManager = Ember.StateManager.extend({
   /** @private
    Returns params if the part matches the partDefinition
    */
-  _matchPart: function(partDefinition, part) {
+  _matchPart: function(partDefinition, part, state) {
+    var params = {};
+
     // Handle string parts
     if( typeof partDefinition == "string") {
 
@@ -475,7 +477,6 @@ Ember.RouteManager = Ember.StateManager.extend({
         // 1. dynamic routes
         case ':':
           var name = partDefinition.slice(1, partDefinition.length);
-          var params = {};
           params[name] = part;
           return params;
 
@@ -493,8 +494,26 @@ Ember.RouteManager = Ember.StateManager.extend({
       return false;
     }
 
-    // Handle RegExp parts
-    return partDefinition.test(part) ? {} : false;
+    if (partDefinition instanceof RegExp) {
+      // JS doesn't support named capture groups in Regexes so instead
+      // we can define a list of 'captures' which maps to the matched groups
+      var captures = get(state, 'captures');
+      var matches = partDefinition.exec(part);
+
+      if (matches) {
+        if (captures) {
+          var len = captures.length, i;
+          for(i = 0; i < len; ++i) {
+            params[captures[i]] = matches[i+1];
+          }
+        }
+        return params;
+      } else {
+        return false;
+      }
+    }
+
+    return false;
   },
 
   /**
@@ -542,7 +561,10 @@ Ember.RouteManager = Ember.StateManager.extend({
       }
     }
     routes._skipRoute = false;
-  }
+  },
+  
+  // This is used to re-enter a dirty root state
+  __nullState: Ember.State.create({enabled: false})
 
 });
 

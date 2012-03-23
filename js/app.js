@@ -117,6 +117,7 @@ App.routeManager = Em.RouteManager.create({
   })
 });
 
-
-
-App.main.appendTo('body');
+$(function() {
+  App.main.appendTo('body');
+  App.routeManager.start();
+});
