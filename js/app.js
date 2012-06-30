@@ -1,5 +1,35 @@
+(function() {
+
+// Handlebars helper to generate lorem ipsum text
+Ember.Handlebars.registerHelper('lorem', function(options) {
+  var opts = {ptags:true}
+  if(options.hash.type) {
+    opts.type = options.hash.type;
+  }
+  if(options.hash.amount) {
+    opts.amount = options.hash.amount;
+  }
+  return new Handlebars.SafeString($('<div></div>').lorem(opts).html());
+});
+
+// A helper function for better code-reuse
+function sectionRoute(name) {
+  return Ember.Route.extend({
+    route: name,
+    connectOutlets: function(router, context) {
+      var SectionView = Ember.View.extend({
+        templateName: 'section' + name
+      });
+      router.get('sectionsController').connectOutlet({viewClass: SectionView});
+    }
+  });
+}
+
+// Create the application
 window.App = Ember.Application.create({
 
+  // Define the main application controller. This is automatically picked up by
+  // the application and initialized.
   ApplicationController: Ember.Controller.extend(),
   ApplicationView: Ember.View.extend({
     templateName: 'application'
@@ -10,10 +40,15 @@ window.App = Ember.Application.create({
     templateName: 'home'
   }),
 
+  SectionsController: Ember.Controller.extend(),
+  SectionsView: Ember.View.extend({
+    templateName: 'sections'
+  }),
+
   ItemsController: Ember.ArrayController.extend({
     init: function() {
       this._super();
-      var items = []
+      var items = [];
       for(var i = 0; i < 10; i++) {
         var description = $('<div></div>').lorem({ptags:true}).html();
         items.push({id: i, title: 'Item ' + i, description: description});
@@ -35,14 +70,34 @@ window.App = Ember.Application.create({
       doHome: function(router, event) {
         router.transitionTo('home');
       },
+      doSections: function(router, event) {
+        router.transitionTo('sections.index');
+      },
       doItems: function(router, event) {
         router.transitionTo('items');
       },
       home: Ember.Route.extend({
         route: '/',
-        connectOutlets: function(router, context) {
+        connectOutlets: function(router, event) {
           router.get('applicationController').connectOutlet('home');
         }
+      }),
+      sections: Ember.Route.extend({
+        route: '/sections',
+        connectOutlets: function(router, event) {
+          router.get('applicationController').connectOutlet('sections');
+        },
+        index: Ember.Route.extend({
+          route: '/'
+        }),
+        doSectionA: function(router, event) { router.transitionTo('sections.sectionA'); },
+        sectionA: sectionRoute('A'),
+        doSectionB: function(router, event) { router.transitionTo('sections.sectionB'); },
+        sectionB: sectionRoute('B'),
+        doSectionC: function(router, event) { router.transitionTo('sections.sectionC'); },
+        sectionC: sectionRoute('C'),
+        doSectionD: function(router, event) { router.transitionTo('sections.sectionD'); },
+        sectionD: sectionRoute('D')
       }),
       items: Ember.Route.extend({
         route: '/items',
@@ -67,3 +122,5 @@ window.App = Ember.Application.create({
 });
 
 App.initialize();
+
+})();

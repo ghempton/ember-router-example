@@ -36,6 +36,7 @@
             <div class="nav-collapse">
               <ul class="nav">
                 <li class="home"><a {{action "doHome"}}>Home</a></li>
+                <li class="sections"><a {{action "doSections"}}>Sections</a></li>
                 <li class="items"><a {{action "doItems"}}>Items</a></li>
               </ul>
             </div>
@@ -56,9 +57,51 @@
       </div>
     </script>
 
+    <script type="text/x-handlebars" data-template-name="sections">
+      <h1>Layout Nesting</h1>
+      <p>Layouts can be nested arbitrarily deep using <code>dynamicView</code> calls.</p>
+      <div class="subnav">
+        <ul class ="nav nav-pills">
+          <li class="sectionA"><a {{action "doSectionA"}}>Section A</a></li>
+          <li class="sectionB"><a {{action "doSectionB"}}>Section B</a></li>
+          <li class="sectionC"><a {{action "doSectionC"}}>Section C</a></li>
+          <li class="sectionD"><a {{action "doSectionD"}}>Section D</a></li>
+        </ul>
+      </div>
+      {{outlet}}
+    </script>
+
+    <script type="text/x-handlebars" data-template-name="sectionA">
+      <section>
+        <h1>Section A</h1>
+        {{lorem type=paragraph amount=4}}
+      </section>
+    </script>
+
+    <script type="text/x-handlebars" data-template-name="sectionB">
+      <section>
+        <h1>Section B</h1>
+        {{lorem type=paragraph amount=4}}
+      </section>
+    </script>
+
+    <script type="text/x-handlebars" data-template-name="sectionC">
+      <section>
+        <h1>Section C</h1>
+        {{lorem type=paragraph amount=4}}
+      </section>
+    </script>
+
+    <script type="text/x-handlebars" data-template-name="sectionD">
+      <section>
+        <h1>Section D</h1>
+        {{lorem type=paragraph amount=4}}
+      </section>
+    </script>
+
     <script type="text/x-handlebars" data-template-name="items">
       <h1>Items</h1>
-      <ul>
+      <ul class="nav nav-tabs nav-stacked">
         {{#each item in content}}
           <li><a {{action "doItem" context="item"}}>{{item.title}}</a></li>
         {{/each}}
