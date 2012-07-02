@@ -35,9 +35,9 @@
             <a class="brand" href="#">Ember.js Router Example</a>
             <div class="nav-collapse">
               <ul class="nav">
-                <li class="home"><a {{action "doHome"}}>Home</a></li>
-                <li class="sections"><a {{action "doSections"}}>Sections</a></li>
-                <li class="items"><a {{action "doItems"}}>Items</a></li>
+                <li class="home" {{bindAttr class="isHome:active"}}><a {{action "doHome"}}>Home</a></li>
+                <li class="sections" {{bindAttr class="isSections:active"}}><a {{action "doSections"}}>Sections</a></li>
+                <li class="items" {{bindAttr class="isItems:active"}}><a {{action "doItems"}}>Items</a></li>
               </ul>
             </div>
           </div>
@@ -51,23 +51,27 @@
     
     <script type="text/x-handlebars" data-template-name="home">
       <div class="hero-unit">
-        <h1>Ember.js Routing Exmaple</h1>
-        <p>This is a quick example showing basic usage of the Ember Router and outlets.</p>
+        <h1>Ember.js Routing Example</h1>
+        <p>
+          This is a quick example showing basic usage of the Ember Router and outlets.<br />
+          View it on <a href="https://github.com/ghempton/ember-layout-example">GitHub</a>.
         </p>
       </div>
     </script>
 
     <script type="text/x-handlebars" data-template-name="sections">
-      <h1>Layout Nesting</h1>
-      <p>Layouts can be nested arbitrarily deep using <code>dynamicView</code> calls.</p>
-      <div class="subnav">
-        <ul class ="nav nav-pills">
-          <li class="sectionA"><a {{action "doSectionA"}}>Section A</a></li>
-          <li class="sectionB"><a {{action "doSectionB"}}>Section B</a></li>
-          <li class="sectionC"><a {{action "doSectionC"}}>Section C</a></li>
-          <li class="sectionD"><a {{action "doSectionD"}}>Section D</a></li>
-        </ul>
-      </div>
+      <header class="jumbotron subhead">
+        <h1>Layout Nesting</h1>
+        <p>Views can be dynamically nested using <code>&#123;&#123;outlet&#125;&#125;</code> handlebars helpers.</p>
+        <div class="subnav">
+          <ul class ="nav nav-pills">
+            <li class="sectionA" {{bindAttr class="isSectionA:active"}}><a {{action "doSectionA"}}>Section A</a></li>
+            <li class="sectionB" {{bindAttr class="isSectionB:active"}}><a {{action "doSectionB"}}>Section B</a></li>
+            <li class="sectionC" {{bindAttr class="isSectionC:active"}}><a {{action "doSectionC"}}>Section C</a></li>
+            <li class="sectionD" {{bindAttr class="isSectionD:active"}}><a {{action "doSectionD"}}>Section D</a></li>
+          </ul>
+        </div>
+      </header>
       {{outlet}}
     </script>
 
@@ -100,7 +104,10 @@
     </script>
 
     <script type="text/x-handlebars" data-template-name="items">
-      <h1>Items</h1>
+      <header class="jumbotron subhead">
+        <h1>Route Parameters</h1>
+        <p>Named parameters can be extracted from routes defined with <code>:property_name</code> segments.</p>
+      </header>
       <ul class="nav nav-tabs nav-stacked">
         {{#each item in content}}
           <li><a {{action "doItem" context="item"}}>{{item.title}}</a></li>

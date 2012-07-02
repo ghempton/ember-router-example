@@ -12,7 +12,7 @@ Ember.Handlebars.registerHelper('lorem', function(options) {
   return new Handlebars.SafeString($('<div></div>').lorem(opts).html());
 });
 
-// A helper function for better code-reuse
+// A helper function to define routes for better code reuse
 function sectionRoute(name) {
   return Ember.Route.extend({
     route: name,
@@ -25,12 +25,29 @@ function sectionRoute(name) {
   });
 }
 
+// A helper function to define a property used to render the navigation. Returns
+// true if a state with the specified name is somewhere along the current route.
+function stateFlag(name) {
+  return Ember.computed(function() {
+    var state = App.router.currentState;
+    while(state) {
+      if(state.name === name) return true;
+      state = state.get('parentState');
+    }
+    return false;
+  }).property('App.router.currentState');
+}
+
 // Create the application
 window.App = Ember.Application.create({
 
   // Define the main application controller. This is automatically picked up by
   // the application and initialized.
-  ApplicationController: Ember.Controller.extend(),
+  ApplicationController: Ember.Controller.extend({
+    isHome: stateFlag('home'),
+    isSections: stateFlag('sections'),
+    isItems: stateFlag('items')
+  }),
   ApplicationView: Ember.View.extend({
     templateName: 'application'
   }),
@@ -40,7 +57,12 @@ window.App = Ember.Application.create({
     templateName: 'home'
   }),
 
-  SectionsController: Ember.Controller.extend(),
+  SectionsController: Ember.Controller.extend({
+    isSectionA: stateFlag('sectionA'),
+    isSectionB: stateFlag('sectionB'),
+    isSectionC: stateFlag('sectionC'),
+    isSectionD: stateFlag('sectionD')
+  }),
   SectionsView: Ember.View.extend({
     templateName: 'sections'
   }),
@@ -101,6 +123,17 @@ window.App = Ember.Application.create({
       }),
       items: Ember.Route.extend({
         route: '/items',
+        index: Ember.Route.extend({
+          route: '/'
+        }),
+        item: Ember.Route.extend({
+          route: '/:item_id',
+          connectOutlets: function(router, context) {
+            var item = router.getPath('itemsController.content').objectAt(context.item_id);
+            router.get('itemController').set('content', item);
+            router.get('applicationController').connectOutlet('item');
+          }
+        }),
         connectOutlets: function(router, context) {
           router.get('applicationController').connectOutlet('items');
         },
@@ -108,14 +141,6 @@ window.App = Ember.Application.create({
           router.transitionTo('item', {item_id: event.context.id});
         }
       }),
-      item: Ember.Route.extend({
-        route: '/items/:item_id',
-        connectOutlets: function(router, context) {
-          var item = router.getPath('itemsController.content').objectAt(context.item_id);
-          router.get('itemController').set('content', item);
-          router.get('applicationController').connectOutlet('item');
-        }
-      })
     })
   })
 
