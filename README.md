@@ -1,5 +1,5 @@
 ## Ember Routing and Layout Example
 
-This is a sample app demonstrating the use of [Ember Layout](http://ghempton.github.com/ember-layout) and [Ember Routemanager](http://ghempton.github.com/ember-routemanager).
+This is a sample application demonstrating the user of the Ember router and `{{outlet}}` handlerbars helper.
 
-[See it live](http://ghempton.github.com/ember-layout-example).
+[See it live](http://ghempton.github.com/ember-router-example).
