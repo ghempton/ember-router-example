@@ -96,7 +96,7 @@ window.App = Ember.Application.create({
         router.transitionTo('sections.index');
       },
       doItems: function(router, event) {
-        router.transitionTo('items');
+        router.transitionTo('items.index');
       },
       home: Ember.Route.extend({
         route: '/',
@@ -124,7 +124,10 @@ window.App = Ember.Application.create({
       items: Ember.Route.extend({
         route: '/items',
         index: Ember.Route.extend({
-          route: '/'
+          route: '/',
+          connectOutlets: function(router, context) {
+            router.get('applicationController').connectOutlet('items');
+          }
         }),
         item: Ember.Route.extend({
           route: '/:item_id',
@@ -134,9 +137,6 @@ window.App = Ember.Application.create({
             router.get('applicationController').connectOutlet('item');
           }
         }),
-        connectOutlets: function(router, context) {
-          router.get('applicationController').connectOutlet('items');
-        },
         doItem: function(router, event) {
           router.transitionTo('item', {item_id: event.context.id});
         }
