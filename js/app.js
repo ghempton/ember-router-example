@@ -146,6 +146,8 @@ window.App = Ember.Application.create({
 
 });
 
+$(function() {
 App.initialize();
+});
 
 })();
