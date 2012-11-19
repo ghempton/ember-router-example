@@ -119,7 +119,14 @@
     <script type="text/x-handlebars" data-template-name="item">
       <h1>{{title}}</h1>
       {{{description}}}
+      <a {{action "doDetail"}}>Details</a>
     </script>
+
+    <script type="text/x-handlebars" data-template-name="itemDetail">
+      <h1>Item detail</h1>
+      {{title}}
+    </script>
+
 
   </body>
 </html>

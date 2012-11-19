@@ -87,6 +87,11 @@ window.App = Ember.Application.create({
     templateName: 'item'
   }),
 
+  ItemDetailController: Ember.ObjectController.extend(),
+  ItemDetailView: Ember.View.extend({
+    templateName: 'itemDetail'
+  }),
+
   Router: Ember.Router.extend({
     root: Ember.Route.extend({
       doHome: function(router, event) {
@@ -131,14 +136,28 @@ window.App = Ember.Application.create({
         }),
         item: Ember.Route.extend({
           route: '/:item_id',
+          index: Ember.Route.extend({
+            route: '/'
+          }),
           connectOutlets: function(router, context) {
             var item = router.getPath('itemsController.content').objectAt(context.item_id);
             router.get('itemController').set('content', item);
             router.get('applicationController').connectOutlet('item');
+          },
+          itemDetail: Ember.Route.extend({
+            route: 'detail',
+            connectOutlets: function(router, context) {
+              var itemController = router.get('itemController');
+              var tstItem = {title: itemController.get('title')};
+              router.get('applicationController').connectOutlet('itemDetail', tstItem);
+            }
+          }),
+          doDetail: function(router, event) {
+            router.transitionTo('itemDetail');
           }
         }),
         doItem: function(router, event) {
-          router.transitionTo('item', {item_id: event.context.id});
+          router.transitionTo('item.index', {item_id: event.context.id});
         }
       })
     })
